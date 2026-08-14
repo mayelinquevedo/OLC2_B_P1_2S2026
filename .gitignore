@@ -1,6 +1,12 @@
-venv/
+#entornos de python
+venv/        
 __pycache__/
-node_modules/
 *.pyc
+
+#dependencias react/node
+node_modules/
+
 build/
+
+#variables de entorno
 .env
