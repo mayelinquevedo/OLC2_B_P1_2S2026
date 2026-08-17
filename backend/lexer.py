@@ -160,6 +160,17 @@ t_MENORQUE = r'<'
 t_NOT = r'!'
 t_AMPER = r'&'
 
+#IGNORAR LOS COMETNARIOS
+#COMENTARIOS DE UNA LINEA // ...
+def t_COMENTARIO_LINEA(t):
+    r'//[^\n]*'
+    pass #para no retoranr el token y asi ignorar el comentario
+
+#COMENTARIOS DE BLOQUE /* ... */
+def t_COMENTARIO_BLOQUE(t):
+    r'/\*(.|\n)*?\*/'
+    t.lexer.lineno += t.value.count('\n')  # Actualizar el número de línea si el comentario abarca muchas
+    pass #para no retoranr el token y asi ignorar el comentario
 
 #caracteres ignorados
 t_ignore = ' \t'
@@ -181,10 +192,37 @@ lexer = lex.lex()
 #solo para pruebas
 if __name__ == '__main__':
     data = '''
-    let nombre = "Ana";
-    let saludo = "Hola\\nMundo";
-    let comillas = "Dijo: \\"Hola\\"";
-    let letra = 'a';
+    // Programa de prueba completo
+    fn sumar(a: i32, b: i32) -> i32 {
+        return a + b;
+    }
+
+    fn main() {
+        let mut contador: i32 = 0;
+        let nombre: String = "Ana";
+        let activo: bool = true;
+        let letra: char = 'x';
+
+        /* Bloque de comentario
+           de varias líneas */
+        while contador < 10 {
+            contador += 1;
+        }
+
+        if contador == 10 && activo {
+            println!("Contador llego a {}", contador);
+        } else if !activo {
+            println!("Inactivo");
+        }
+
+        let numeros = [1, 2, 3, 4, 5];
+        let slice = &numeros[1..4];
+
+        match contador {
+            10 => println!("Diez"),
+            _ => println!("Otro valor"),
+        }
+    }
     '''
     lexer.input(data)
     for tok in lexer:
