@@ -34,11 +34,18 @@ tokens = [
     'MULT', 'DIV', 'MODULO',
     'IGUAL', 
     'MAYORQUE', 'MENORQUE',
+    'IGUAL_IGUAL', 'DIFERENTE',
+    'MAYOR_IGUAL', 'MENOR_IGUAL',
+    'AND', 'OR', 'NOT', 'AMPER',
+    'MAS_IGUAL', 'MENOS_IGUAL',
+    'MULT_IGUAL', 'DIV_IGUAL', 'MODULO_IGUAL',
+    'RANGO',
     'LLAVE_IZQ', 'LLAVE_DER', 
     'PAREN_IZQ', 'PAREN_DER',
     'CORCH_IZQ', 'CORCH_DER',
     'DOS_PUNTOS', 'PUNTO_COMA',
     'COMA', 'PUNTO',
+
 ] + list(reservadas.values())
 
 #identificadores
@@ -54,9 +61,9 @@ t_MULT = r'\*'
 t_DIV = r'/'
 t_MODULO = r'%'
 
-t_IGUAL = r'='
-t_MAYORQUE = r'>'
-t_MENORQUE = r'<'
+#t_IGUAL = r'='
+#t_MAYORQUE = r'>'
+#t_MENORQUE = r'<'
 
 t_LLAVE_IZQ = r'\{'
 t_LLAVE_DER = r'\}'
@@ -81,6 +88,63 @@ def t_NUMERO_ENTERO(t):
     t.value = int(t.value)
     return t
 
+#Operadores relacionales, logicos y de asigncaion
+#PRIMERO COMPUESTOS
+def t_IGUAL_IGUAL(t):
+    r'=='
+    return t
+
+def t_DIFERENTE(t):
+    r'!='
+    return t
+
+def t_MAYOR_IGUAL(t):
+    r'>='
+    return t
+
+def t_MENOR_IGUAL(t):
+    r'<='
+    return t
+
+def t_AND(t):
+    r'&&'
+    return t
+
+def t_OR(t):
+    r'\|\|'
+    return t
+
+def t_MAS_IGUAL(t):
+    r'\+='
+    return t
+
+def t_MENOS_IGUAL(t):
+    r'-='
+    return t
+
+def t_MULT_IGUAL(t):
+    r'\*='
+    return t
+
+def t_DIV_IGUAL(t):
+    r'/='
+    return t    
+
+def t_MODULO_IGUAL(t):
+    r'%='
+    return t
+
+def t_RANGO(t):
+    r'\.\.'
+    return t
+
+#LUEGO SIMPLES
+t_IGUAL = r'='
+t_MAYORQUE = r'>'
+t_MENORQUE = r'<'
+t_NOT = r'!'
+t_AMPER = r'&'
+
 
 #caracteres ignorados
 t_ignore = ' \t'
@@ -102,14 +166,16 @@ lexer = lex.lex()
 #solo para pruebas
 if __name__ == '__main__':
     data = '''
-    let mut edad: i32 = 20; 
-    fn saludar(){
-        if edad {
-            return true; 
-        }
+    let mut x: i32 = 10;
+    let y: i32 = 20;
+    if x == y {
+        x += 1;
     }
+    if x != y && x < y {
+        x -= 1;
+    }
+    let rango = 1..5;
     '''
-
     lexer.input(data)
     for tok in lexer:
         print(tok)
