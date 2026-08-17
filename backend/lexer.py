@@ -30,6 +30,7 @@ tokens = [
     'IDENTIFICADOR',
     'NUMERO_ENTERO',
     'NUMERO_DECIMAL',
+    'STRING', 'CHAR',
     'MAS', 'MENOS', 
     'MULT', 'DIV', 'MODULO',
     'IGUAL', 
@@ -87,6 +88,20 @@ def t_NUMERO_ENTERO(t):
     r'\d+'
     t.value = int(t.value)
     return t
+
+#Strings (cadena texto entre comillas dobles " " )
+def t_STRING(t):
+    r'"([^"\\]|\\.)*"'
+    t.value = t.value[1:-1]  # quitar las comillas dobles al inicio y del final
+    return t
+
+#Chars (un solo caracter entre comillas simples ' ')
+def t_CHAR(t):
+    r"'([^'\\]|\\.)'"
+    t.value = t.value[1:-1]  # quitar las comillas simples al inicio y del final
+    return t
+
+
 
 #Operadores relacionales, logicos y de asigncaion
 #PRIMERO COMPUESTOS
@@ -166,15 +181,10 @@ lexer = lex.lex()
 #solo para pruebas
 if __name__ == '__main__':
     data = '''
-    let mut x: i32 = 10;
-    let y: i32 = 20;
-    if x == y {
-        x += 1;
-    }
-    if x != y && x < y {
-        x -= 1;
-    }
-    let rango = 1..5;
+    let nombre = "Ana";
+    let saludo = "Hola\\nMundo";
+    let comillas = "Dijo: \\"Hola\\"";
+    let letra = 'a';
     '''
     lexer.input(data)
     for tok in lexer:
