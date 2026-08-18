@@ -190,6 +190,14 @@ def t_COMENTARIO_BLOQUE(t):
     t.lexer.lineno += t.value.count('\n')  # Actualizar el número de línea si el comentario abarca muchas
     pass #para no retoranr el token y asi ignorar el comentario
 
+#COMENTARIO DE BLOQUE SIN CERRAR 
+def t_COMENTARIO_BLOQUE_SIN_CERRAR(t):
+    r'/\*(.|\n)*'
+    print(f"[Error Léxico] Línea {t.lineno}: Comentario de bloque sin cerrar (falta '*/')")
+    t.lexer.lineno += t.value.count('\n')
+    pass
+
+
 #caracteres ignorados
 t_ignore = ' \t'
 
@@ -210,13 +218,10 @@ lexer = lex.lex()
 #solo para pruebas
 if __name__ == '__main__':
     data = '''
-    let letra: char = 'x';
-
-    'outer: loop {
-        'inner: loop {
-            break 'outer;
-        }
-    }
+    let x: i32 = 10;
+    /* Este comentario
+       sí cierra bien */
+    let y: i32 = 20;
     '''
     lexer.input(data)
     for tok in lexer:
