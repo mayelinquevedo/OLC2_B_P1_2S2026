@@ -46,7 +46,39 @@ class OperacionBinaria(Nodo):
         return f"({self.izquierda} {self.operador} {self.derecha})"
 
 
-#este bloque de prueba estará cambiando conforme agrego caracteristicas al AST_NODES.py
+
+#SENTENCIA if/if else
+class If(Nodo):
+    def __init__(self, condicion, bloque_si, bloque_sino=None):
+        self.condicion = condicion
+        self.bloque_si = bloque_si
+        self.bloque_sino = bloque_sino
+
+    def __repr__(self):
+        return f"If({self.condicion}, si={self.bloque_si}, sino={self.bloque_sino})"
+
+#SENTENCIA while
+
+class While(Nodo):
+    def __init__(self, condicion, bloque):
+        self.condicion = condicion  
+        self.bloque = bloque        # lista de nodos (sentencias dentro del while)
+
+    def __repr__(self):
+        return f"While({self.condicion}, {self.bloque})"
+
+#LLAMADA A FUNCION println
+class LlamadaFuncion(Nodo):
+    def __init__(self, nombre, argumentos):
+        self.nombre = nombre          # nombre de la función,
+        self.argumentos = argumentos  # lista de nodos (los argumentos pasados)
+
+    def __repr__(self):
+        return f"LlamadaFuncion({self.nombre}, {self.argumentos})"
+
+
+
+#este bloque de prueba lo estaré cambiando conforme le agrego caracteristicas a mi AST
 #parte de codigo, solo para prueba 
 if __name__ == '__main__':
     lit = Literal(10, 'i32')
@@ -55,7 +87,12 @@ if __name__ == '__main__':
     ident = Identificadores('x')
     print(ident)
 
-    # Simulamos: let x: i32 = 10 + 5;
     suma = OperacionBinaria(Literal(10, 'i32'), '+', Literal(5, 'i32'))
     decl = DeclaracionVariable('x', 'i32', suma, mutable=False)
     print(decl)
+
+    # Simulamos: if x > 5 { println!("mayor"); }
+    condicion = OperacionBinaria(Identificadores('x'), '>', Literal(5, 'i32'))
+    llamada = LlamadaFuncion('println!', [Literal('mayor', 'String')])
+    sentencia_if = If(condicion, [llamada])
+    print(sentencia_if)
