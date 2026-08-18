@@ -41,6 +41,7 @@ tokens = [
     'MAS_IGUAL', 'MENOS_IGUAL',
     'MULT_IGUAL', 'DIV_IGUAL', 'MODULO_IGUAL',
     'RANGO',
+    'FLECHA', 'FLECHA_MATCH',
     'LLAVE_IZQ', 'LLAVE_DER', 
     'PAREN_IZQ', 'PAREN_DER',
     'CORCH_IZQ', 'CORCH_DER',
@@ -109,8 +110,17 @@ def t_IGUAL_IGUAL(t):
     r'=='
     return t
 
+
 def t_DIFERENTE(t):
     r'!='
+    return t
+
+def t_FLECHA(t):
+    r'->'
+    return t
+
+def t_FLECHA_MATCH(t):
+    r'=>'
     return t
 
 def t_MAYOR_IGUAL(t):
