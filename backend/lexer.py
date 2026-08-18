@@ -30,7 +30,7 @@ tokens = [
     'IDENTIFICADOR',
     'NUMERO_ENTERO',
     'NUMERO_DECIMAL',
-    'STRING', 'CHAR',
+    'STRING', 'CHAR', 'ETIQUETA',
     'MAS', 'MENOS', 
     'MULT', 'DIV', 'MODULO',
     'IGUAL', 
@@ -96,11 +96,19 @@ def t_STRING(t):
     t.value = t.value[1:-1]  # quitar las comillas dobles al inicio y del final
     return t
 
+
 #Chars (un solo caracter entre comillas simples ' ')
 def t_CHAR(t):
     r"'([^'\\]|\\.)'"
-    t.value = t.value[1:-1]  # quitar las comillas simples al inicio y del final
+    t.value = t.value[1:-1]
     return t
+
+#Etiquetas de loop ('outer, 'inner, etc)
+def t_ETIQUETA(t):
+    r"'[a-zA-Z_][a-zA-Z0-9_]*"
+    t.value = t.value[1:]  #quitar la comilla simple al inicio
+    return t
+
 
 
 
@@ -202,35 +210,11 @@ lexer = lex.lex()
 #solo para pruebas
 if __name__ == '__main__':
     data = '''
-    // Programa de prueba completo
-    fn sumar(a: i32, b: i32) -> i32 {
-        return a + b;
-    }
+    let letra: char = 'x';
 
-    fn main() {
-        let mut contador: i32 = 0;
-        let nombre: String = "Ana";
-        let activo: bool = true;
-        let letra: char = 'x';
-
-        /* Bloque de comentario
-           de varias líneas */
-        while contador < 10 {
-            contador += 1;
-        }
-
-        if contador == 10 && activo {
-            println!("Contador llego a {}", contador);
-        } else if !activo {
-            println!("Inactivo");
-        }
-
-        let numeros = [1, 2, 3, 4, 5];
-        let slice = &numeros[1..4];
-
-        match contador {
-            10 => println!("Diez"),
-            _ => println!("Otro valor"),
+    'outer: loop {
+        'inner: loop {
+            break 'outer;
         }
     }
     '''
