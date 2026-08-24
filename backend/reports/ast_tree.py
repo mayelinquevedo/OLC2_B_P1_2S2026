@@ -74,10 +74,15 @@ def generar_ast(raiz, nombre_archivo="ast_output"):
 
   # ejemplo de una resta: let resultado = 15  - 5;
 if __name__ == "__main__":
-    from ast_nodes import Literal, OperacionBinaria, DeclaracionVariable
+    from ast_nodes import (Literal, Identificadores, DeclaracionVariable, LlamadaFuncion, FuncionDecl, Programa)
 
+    decl_x = DeclaracionVariable (nombre="x", tipo="i32", valor=Literal(10, "i32"), mutable=False)
 
-    resta = OperacionBinaria(Literal(15, "i32"), "-", Literal(5, "i32"))
-    decl_resultado = DeclaracionVariable("resultado_resta", "i32", resta, mutable=False)
+    llamada_print = LlamadaFuncion(nombre="println!", argumentos=[Identificadores("x")])
 
-    generar_ast(decl_resultado, "backend/reports/prueba_resta2")
+    funcion_main = FuncionDecl(nombre="main", parametros=[], tipo_retorno=None, cuerpo=[decl_x, llamada_print])
+
+    programa = Programa(declaraciones=[funcion_main])
+    
+    generar_ast(programa, "backend/reports/prueba1del_enunciado")
+

@@ -221,7 +221,7 @@ if __name__ == '__main__':
     let x: i32 = 10;
     /* Este comentario
        sí cierra bien */
-    let y: i32 = 20;
+    let y: i32 = 20; //prueba de comentario 1 linea
     '''
     lexer.input(data)
     for tok in lexer:

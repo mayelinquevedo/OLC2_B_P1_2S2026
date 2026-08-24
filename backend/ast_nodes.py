@@ -198,7 +198,7 @@ class Programa(Nodo):
         return f"Programa({self.declaraciones})"
     
 
-#ESTE ERA SOLO PARA PRUEBAS
+#ESTE ES SOLO PARA PRUEBAS
 if __name__ == '__main__':
     lit = Literal(10, 'i32')
     print(lit)
