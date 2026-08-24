@@ -1,13 +1,11 @@
 """
-aquí voy a Generar uuna imagen con ayuda de graphviz de cualquier
+aquí voy a Generar una imagen con ayuda de graphviz de cualquier
 arbol construido con las clases de ast_nodes.py
 """
-#impotar graphviz  
 from graphviz import Digraph
 import sys
 import os
 
-#importar ast_nodes.py a
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from ast_nodes import Nodo
 
@@ -71,18 +69,12 @@ def generar_ast(raiz, nombre_archivo="ast_output"):
     print(f"AST generado en: {nombre_archivo}.png")
 
 
-
-  # ejemplo de una resta: let resultado = 15  - 5;
 if __name__ == "__main__":
     from ast_nodes import (Literal, Identificadores, DeclaracionVariable, LlamadaFuncion, FuncionDecl, Programa)
 
-    decl_x = DeclaracionVariable (nombre="x", tipo="i32", valor=Literal(10, "i32"), mutable=False)
-
+    decl_x = DeclaracionVariable(nombre="x", tipo="i32", valor=Literal(10, "i32"), mutable=False)
     llamada_print = LlamadaFuncion(nombre="println!", argumentos=[Identificadores("x")])
-
     funcion_main = FuncionDecl(nombre="main", parametros=[], tipo_retorno=None, cuerpo=[decl_x, llamada_print])
-
     programa = Programa(declaraciones=[funcion_main])
-    
-    generar_ast(programa, "backend/reports/prueba1del_enunciado")
 
+    generar_ast(programa, "backend/reports/prueba1del_enunciado")

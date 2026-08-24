@@ -6,10 +6,10 @@ construye el (AST) usando las clases definidas en ast_nodes.py.
 import ply.yacc as yacc
 from lexer import tokens  #llamda a tokens, los qe se definieron en el lexer.py
 from ast_nodes import *   #  nodos del AST
+from reports.ast_tree import generar_ast
 
 
-
-start = 'sentencia' #temporal, solo para algunas pruebas iniciales   
+start = 'programa' #solo para algunas pruebas iniciales   
 
 #Precedencia de operadores (tomando en cuenta de menor a mayor prioridad)
 precedence = (
@@ -67,6 +67,166 @@ def p_expresion_true(p):
 def p_expresion_false(p):
     'expresion : FALSE'
     p[0] = Literal(False, 'bool')
+
+
+# Bloque de sentencias { ... }
+def p_bloque(p):
+    'bloque : LLAVE_IZQ lista_sentencias LLAVE_DER'
+    p[0] = p[2]
+
+def p_lista_sentencias_multiple(p):
+    'lista_sentencias : lista_sentencias sentencia'
+    p[0] = p[1] + [p[2]]
+
+def p_lista_sentencias_una(p):
+    'lista_sentencias : sentencia'
+    p[0] = [p[1]]
+
+def p_lista_sentencias_vacia(p):
+    'lista_sentencias : '
+    p[0] = []
+
+
+# Asignacion (reasignar variable existente)
+def p_sentencia_asignacion(p):
+    '''sentencia : IDENTIFICADOR IGUAL expresion PUNTO_COMA
+                  | IDENTIFICADOR MAS_IGUAL expresion PUNTO_COMA
+                  | IDENTIFICADOR MENOS_IGUAL expresion PUNTO_COMA
+                  | IDENTIFICADOR MULT_IGUAL expresion PUNTO_COMA
+                  | IDENTIFICADOR DIV_IGUAL expresion PUNTO_COMA
+                  | IDENTIFICADOR MODULO_IGUAL expresion PUNTO_COMA'''
+    p[0] = Asignacion(p[1], p[2], p[3])
+
+
+# println! y llamadas a funcion
+def p_sentencia_llamada(p):
+    'sentencia : llamada_funcion PUNTO_COMA'
+    p[0] = p[1]
+
+def p_llamada_funcion_normal(p):
+    'llamada_funcion : IDENTIFICADOR PAREN_IZQ lista_argumentos PAREN_DER'
+    p[0] = LlamadaFuncion(p[1], p[3])
+
+# println! se tokeniza como IDENTIFICADOR('println') seguido de NOT ('!')
+def p_llamada_println(p):
+    'llamada_funcion : IDENTIFICADOR NOT PAREN_IZQ lista_argumentos PAREN_DER'
+    p[0] = LlamadaFuncion(p[1] + '!', p[4])
+
+def p_expresion_llamada(p):
+    'expresion : llamada_funcion'
+    p[0] = p[1]
+
+def p_lista_argumentos_multiple(p):
+    'lista_argumentos : lista_argumentos COMA expresion'
+    p[0] = p[1] + [p[3]]
+
+def p_lista_argumentos_uno(p):
+    'lista_argumentos : expresion'
+    p[0] = [p[1]]
+
+def p_lista_argumentos_vacia(p):
+    'lista_argumentos : '
+    p[0] = []
+
+
+# if / if-else
+def p_sentencia_if(p):
+    'sentencia : IF expresion bloque'
+    p[0] = If(p[2], p[3])
+
+def p_sentencia_if_else(p):
+    'sentencia : IF expresion bloque ELSE bloque'
+    p[0] = If(p[2], p[3], p[5])
+
+def p_sentencia_if_else_if(p):
+    'sentencia : IF expresion bloque ELSE sentencia'
+    p[0] = If(p[2], p[3], [p[5]])
+
+
+# while
+def p_sentencia_while(p):
+    'sentencia : WHILE expresion bloque'
+    p[0] = While(p[2], p[3])
+
+
+# loop (con  etiqueta o sin ella)
+def p_sentencia_loop(p):
+    'sentencia : LOOP bloque'
+    p[0] = Loop(p[2])
+
+def p_sentencia_loop_etiquetado(p):
+    'sentencia : ETIQUETA DOS_PUNTOS LOOP bloque'
+    p[0] = Loop(p[4], etiqueta=p[1])
+
+
+# return / break / continue
+def p_sentencia_return_valor(p):
+    'sentencia : RETURN expresion PUNTO_COMA'
+    p[0] = Return(p[2])
+
+def p_sentencia_return_vacio(p):
+    'sentencia : RETURN PUNTO_COMA'
+    p[0] = Return(None)
+
+def p_sentencia_break(p):
+    'sentencia : BREAK PUNTO_COMA'
+    p[0] = Break()
+
+def p_sentencia_break_etiqueta(p):
+    'sentencia : BREAK ETIQUETA PUNTO_COMA'
+    p[0] = Break(p[2])
+
+def p_sentencia_continue(p):
+    'sentencia : CONTINUE PUNTO_COMA'
+    p[0] = Continue()
+
+def p_sentencia_continue_etiqueta(p):
+    'sentencia : CONTINUE ETIQUETA PUNTO_COMA'
+    p[0] = Continue(p[2])
+
+
+# Funciones
+def p_funcion_decl(p):
+    'funcion : FN IDENTIFICADOR PAREN_IZQ lista_parametros PAREN_DER bloque'
+    p[0] = FuncionDecl(p[2], p[4], None, p[6])
+
+def p_funcion_decl_con_retorno(p):
+    'funcion : FN IDENTIFICADOR PAREN_IZQ lista_parametros PAREN_DER FLECHA tipo bloque'
+    p[0] = FuncionDecl(p[2], p[4], p[7], p[8])
+
+def p_lista_parametros_multiple(p):
+    'lista_parametros : lista_parametros COMA parametro'
+    p[0] = p[1] + [p[3]]
+
+def p_lista_parametros_uno(p):
+    'lista_parametros : parametro'
+    p[0] = [p[1]]
+
+def p_lista_parametros_vacia(p):
+    'lista_parametros : '
+    p[0] = []
+
+def p_parametro(p):
+    'parametro : IDENTIFICADOR DOS_PUNTOS tipo'
+    p[0] = (p[1], p[3])
+
+
+
+# Programa completo: una o mas funciones
+def p_programa(p):
+    'programa : lista_funciones'
+    p[0] = Programa(p[1])
+
+def p_lista_funciones_multiple(p):
+    'lista_funciones : lista_funciones funcion'
+    p[0] = p[1] + [p[2]]
+
+def p_lista_funciones_una(p):
+    'lista_funciones : funcion'
+    p[0] = [p[1]]
+
+
+
 
 #  errores sintacticos
 def p_error(p):
@@ -131,7 +291,20 @@ parser = yacc.yacc()
 if __name__ == '__main__':
     from lexer import lexer
 
-    codigo = "let mut x: i32 = 10 + 5;"
+    codigo = '''
+    fn main() {
+        let mut x: i32 = 10;
+        if x > 5 {
+            println!(x);
+        }
+        while x > 0 {
+            x -= 1;
+        }
+    }
+    '''
 
     resultado = parser.parse(codigo, lexer=lexer)
     print(resultado)
+
+    if resultado is not None:
+        generar_ast(resultado, "backend/reports/prueba_parser_main")

@@ -14,4 +14,4 @@ build/
 
 # Archivos generados por PLY (yacc)
 parser.out
-parsertab.py
+parsetab.py
