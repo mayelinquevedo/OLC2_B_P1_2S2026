@@ -1,5 +1,4 @@
-
-#clase base dela que van a heredar todos los nodos del AST
+#clase base de la que van a heredar todos los nodos del AST
 #para identificar cualquier pieza del arbol
 class Nodo:
     pass
@@ -35,7 +34,7 @@ class DeclaracionVariable(Nodo):
         return f"DeclaracionVariable({mut}{self.nombre}: {self.tipo} = {self.valor})"
 
 
-#operacion con dos operandos
+#operacion con dos operandos(SUMA, RESTA, MULTI, DIV, ETC)
 class OperacionBinaria(Nodo):
     def __init__(self, izquierda, operador, derecha):
         self.izquierda = izquierda
@@ -58,7 +57,6 @@ class If(Nodo):
         return f"If({self.condicion}, si={self.bloque_si}, sino={self.bloque_sino})"
 
 #SENTENCIA while
-
 class While(Nodo):
     def __init__(self, condicion, bloque):
         self.condicion = condicion  
@@ -77,9 +75,130 @@ class LlamadaFuncion(Nodo):
         return f"LlamadaFuncion({self.nombre}, {self.argumentos})"
 
 
+#Funciones y transferencias de control
+class FuncionDecl(Nodo):
+    def __init__(self, nombre, parametros, tipo_retorno, cuerpo):
+        self.nombre = nombre
+        self.parametros = parametros
+        self.tipo_retorno = tipo_retorno
+        self.cuerpo = cuerpo
 
-#este bloque de prueba lo estaré cambiando conforme le agrego caracteristicas a mi AST
-#parte de codigo, solo para prueba 
+    def __repr__(self):
+        return f"FuncionDecl({self.nombre}({self.parametros}) -> {self.tipo_retorno}, {self.cuerpo})"
+
+class Return(Nodo):
+    def __init__(self, valor=None):
+        self.valor = valor 
+
+    def __repr__(self):
+        return f"Return({self.valor})"
+
+class Break(Nodo):
+    def __init__(self, etiqueta=None):
+        self.etiqueta = etiqueta 
+        
+    def __repr__(self):
+        return f"Break({self.etiqueta})"
+
+class Continue(Nodo):
+    def __init__(self, etiqueta=None):
+        self.etiqueta = etiqueta 
+        
+    def __repr__(self):
+        return f"Continue({self.etiqueta})"
+
+
+#Loop, asignación y operación unaria
+class Loop(Nodo):
+    def __init__(self, cuerpo, etiqueta=None):
+        self.cuerpo = cuerpo
+        self.etiqueta = etiqueta
+
+    def __repr__(self):
+        return f"Loop(etiqueta={self.etiqueta}, {self.cuerpo})"
+
+
+class Asignacion(Nodo):
+    def __init__(self, nombre, operador, valor):
+            self.nombre = nombre
+            self.operador = operador
+            self.valor = valor
+
+    def __repr__(self):
+        return f"Asignacion({self.nombre} {self.operador} {self.valor})"
+
+
+class OperacionUnaria(Nodo):
+    def __init__(self, operador, operando):
+            self.operador = operador
+            self.operando = operando
+    
+    def __repr__(self):
+        return f"OperacionUnaria({self.operador} {self.operando})"
+
+
+#Arreglos, match y structs
+class Arreglo(Nodo):
+    def __init__(self, elementos):
+        self.elementos = elementos
+
+    def __repr__(self):
+        return f"Arreglo({self.elementos})"
+
+class AccesoIndice(Nodo):
+    def __init__(self, arreglo, indice):
+        self.arreglo = arreglo
+        self.indice = indice
+
+    def __repr__(self):
+        return f"AccesoIndice({self.arreglo}[{self.indice}])"
+
+
+class CasoMatch(Nodo):
+    def __init__(self, patron, cuerpo):
+        self.patron = patron
+        self.cuerpo = cuerpo
+
+    def __repr__(self):
+        patron_str = self.patron if self.patron is not None else "_"
+        return f"CasoMatch({patron_str} => {self.cuerpo})"
+
+class Match(Nodo):
+    def __init__(self, expresion, casos):
+        self.expresion = expresion
+        self.casos = casos
+
+    def __repr__(self):
+        return f"Match({self.expresion}, {self.casos})"
+
+
+class StructDecl(Nodo):
+    def __init__(self, nombre, campos):
+        self.nombre = nombre
+        self.campos = campos
+
+    def __repr__(self):
+        return f"StructDecl({self.nombre}, {self.campos})"
+
+
+class StructInit(Nodo):
+    def __init__(self, nombre, valor):
+        self.nombre = nombre
+        self.valor = valor
+
+    def __repr__(self):
+        return f"StructInit({self.nombre}, {self.valor})"
+
+
+class Programa(Nodo):
+    def __init__(self, declaraciones):
+        self.declaraciones = declaraciones
+
+    def __repr__(self):
+        return f"Programa({self.declaraciones})"
+    
+
+#ESTE ERA SOLO PARA PRUEBAS
 if __name__ == '__main__':
     lit = Literal(10, 'i32')
     print(lit)
@@ -91,7 +210,6 @@ if __name__ == '__main__':
     decl = DeclaracionVariable('x', 'i32', suma, mutable=False)
     print(decl)
 
-    # Simulamos: if x > 5 { println!("mayor"); }
     condicion = OperacionBinaria(Identificadores('x'), '>', Literal(5, 'i32'))
     llamada = LlamadaFuncion('println!', [Literal('mayor', 'String')])
     sentencia_if = If(condicion, [llamada])
