@@ -2,7 +2,6 @@
 Intrerprete del proyecto, recorre el AST ya construido por parser.py 
 y ejecuta el programa
 """
-
 from ast_nodes import *
 
 #Entorno: guarda las variables y sus valores
@@ -91,3 +90,75 @@ class Interprete:
             raise Exception(f"No se sabe como evaluar el nodo: {tipo}")
         return metodo(nodo, entorno)
 
+    def ejec_DeclaracionVariable(self, nodo, entorno):
+        valor = self.evaluar(nodo.valor, entorno) if nodo.valor is not None else None
+        entorno.declarar(nodo.nombre, valor)
+
+    def ejec_Asignacion(self, nodo, entorno):
+        valor_nuevo = self.evaluar(nodo.valor, entorno)
+        if nodo.operador == '=':
+            entorno.asignar(nodo.nombre, valor_nuevo)
+        else:
+            valor_actual = entorno.obtener(nodo.nombre)
+            op = nodo.operador[0]  # '+=' -> '+'
+            resultado = self.aplicar_operador(op, valor_actual, valor_nuevo)
+            entorno.asignar(nodo.nombre, resultado)
+
+    def ejec_LlamadaFuncion(self, nodo, entorno):
+        self.evaluar(nodo, entorno)
+
+    def ejec_If(self, nodo, entorno):
+        condicion = self.evaluar(nodo.condicion, entorno)
+        if condicion:
+            self.ejecutar_bloque(nodo.bloque_si, Entorno(padre=entorno))
+        elif nodo.bloque_sino is not None:
+            self.ejecutar_bloque(nodo.bloque_sino, Entorno(padre=entorno))
+
+    def ejec_While(self, nodo, entorno):
+        while self.evaluar(nodo.condicion, entorno):
+            try:
+                self.ejecutar_bloque(nodo.bloque, Entorno(padre=entorno))
+            except SenalBreak:
+                break
+            except SenalContinue:
+                continue
+
+    def ejec_Loop(self, nodo, entorno):
+        while True:
+            try:
+                self.ejecutar_bloque(nodo.cuerpo, Entorno(padre=entorno))
+            except SenalBreak as señal:
+                if señal.etiqueta is None or señal.etiqueta == nodo.etiqueta:
+                    break
+                raise
+            except SenalContinue as señal:
+                if señal.etiqueta is None or señal.etiqueta == nodo.etiqueta:
+                    continue
+                raise
+
+    def ejec_Return(self, nodo, entorno):
+        valor = self.evaluar(nodo.valor, entorno) if nodo.valor is not None else None
+        raise SenalReturn(valor)
+
+    def ejec_Break(self, nodo, entorno):
+        raise SenalBreak(nodo.etiqueta)
+
+    def ejec_Continue(self, nodo, entorno):
+        raise SenalContinue(nodo.etiqueta)
+
+    def ejec_Match(self, nodo, entorno):
+        valor = self.evaluar(nodo.expresion, entorno)
+        for caso in nodo.casos:
+            if caso.patron is None: 
+                self.ejecutar_sentencia_o_expr(caso.cuerpo, entorno)
+                return
+            patron_valor = self.evaluar(caso.patron, entorno)
+            if patron_valor == valor:
+                self.ejecutar_sentencia_o_expr(caso.cuerpo, entorno)
+                return
+
+    def ejecutar_sentencia_o_expr(self, nodo, entorno):
+        if isinstance(nodo, LlamadaFuncion):
+            self.evaluar(nodo, entorno)
+        else:
+            self.ejecutar_sentencia(nodo, entorno)
