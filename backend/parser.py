@@ -210,8 +210,6 @@ def p_parametro(p):
     'parametro : IDENTIFICADOR DOS_PUNTOS tipo'
     p[0] = (p[1], p[3])
 
-
-
 # Programa completo: una o mas funciones
 def p_programa(p):
     'programa : lista_funciones'
@@ -226,6 +224,95 @@ def p_lista_funciones_una(p):
     p[0] = [p[1]]
 
 
+# Arreglos y acceso por indice
+def p_expresion_arreglo(p):
+    'expresion : CORCH_IZQ lista_argumentos CORCH_DER'
+    p[0] = Arreglo(p[2])
+
+def p_expresion_acceso_indice(p):
+    'expresion : expresion CORCH_IZQ expresion CORCH_DER'
+    p[0] = AccesoIndice(p[1], p[3])
+
+def p_tipo_arreglo(p):
+    'tipo : CORCH_IZQ tipo PUNTO_COMA NUMERO_ENTERO CORCH_DER'
+    p[0] = f"[{p[2]}; {p[4]}]"
+
+
+# Operacion unaria (negacion, negativo)
+def p_expresion_unaria(p):
+    '''expresion : NOT expresion
+                  | MENOS expresion %prec NOT'''
+    p[0] = OperacionUnaria(p[1], p[2])
+
+
+# Match
+def p_sentencia_match(p):
+    'sentencia : MATCH expresion LLAVE_IZQ lista_casos LLAVE_DER'
+    p[0] = Match(p[2], p[4])
+
+def p_lista_casos_multiple(p):
+    'lista_casos : lista_casos caso_match'
+    p[0] = p[1] + [p[2]]
+
+def p_lista_casos_uno(p):
+    'lista_casos : caso_match'
+    p[0] = [p[1]]
+
+def p_caso_match_valor(p):
+    'caso_match : expresion FLECHA_MATCH llamada_funcion COMA'
+    p[0] = CasoMatch(p[1], p[3])
+
+def p_caso_match_comodin(p):
+    'caso_match : IDENTIFICADOR FLECHA_MATCH llamada_funcion COMA'
+    if p[1] == '_':
+        p[0] = CasoMatch(None, p[3])
+    else:
+        p[0] = CasoMatch(Identificadores(p[1]), p[3])
+
+
+# Structs
+def p_struct_decl(p):
+    'sentencia : STRUCT IDENTIFICADOR LLAVE_IZQ lista_campos LLAVE_DER'
+    p[0] = StructDecl(p[2], p[4])
+
+def p_lista_campos_multiple(p):
+    'lista_campos : lista_campos COMA campo'
+    p[0] = p[1] + [p[3]]
+
+def p_lista_campos_uno(p):
+    'lista_campos : campo'
+    p[0] = [p[1]]
+
+def p_lista_campos_vacia(p):
+    'lista_campos : '
+    p[0] = []
+
+def p_campo(p):
+    'campo : IDENTIFICADOR DOS_PUNTOS tipo'
+    p[0] = (p[1], p[3])
+
+# Instanciacion de struct
+def p_declaracion_struct_init(p):
+    'sentencia : LET IDENTIFICADOR IGUAL IDENTIFICADOR LLAVE_IZQ lista_valores LLAVE_DER PUNTO_COMA'
+    p[0] = DeclaracionVariable(p[2], p[4], StructInit(p[4], p[6]), mutable=False)
+
+def p_lista_valores_multiple(p):
+    'lista_valores : lista_valores COMA valor_campo'
+    p[0] = p[1] + [p[3]]
+
+def p_lista_valores_uno(p):
+    'lista_valores : valor_campo'
+    p[0] = [p[1]]
+
+def p_valor_campo(p):
+    'valor_campo : IDENTIFICADOR DOS_PUNTOS expresion'
+    p[0] = (p[1], p[3])
+
+
+# Acceso a campo de struct 
+def p_expresion_acceso_campo(p):
+    'expresion : expresion PUNTO IDENTIFICADOR'
+    p[0] = AccesoIndice(p[1], p[3])  
 
 
 #  errores sintacticos
@@ -293,12 +380,12 @@ if __name__ == '__main__':
 
     codigo = '''
     fn main() {
-        let mut x: i32 = 10;
-        if x > 5 {
-            println!(x);
-        }
-        while x > 0 {
-            x -= 1;
+        let numeros: [i32; 3] = [1, 2, 3];
+        let primero = numeros[0];
+
+        match primero {
+            1 => println!("uno"),
+            _ => println!("otro"),
         }
     }
     '''
@@ -307,4 +394,4 @@ if __name__ == '__main__':
     print(resultado)
 
     if resultado is not None:
-        generar_ast(resultado, "backend/reports/prueba_parser_main")
+        generar_ast(resultado, "backend/reports/prueba_arreglos_match")
