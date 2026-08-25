@@ -11,7 +11,7 @@ class Entorno:
         self.padre = padre
 
     def declarar(self, nombre, valor):
-        self.variable[nombre] = valor
+        self.variables[nombre] = valor
 
     def obtener(self, nombre):
         if nombre in self.variables:
@@ -162,3 +162,85 @@ class Interprete:
             self.evaluar(nodo, entorno)
         else:
             self.ejecutar_sentencia(nodo, entorno)
+
+    def eval_Literal(self, nodo, entorno):
+        return nodo.valor
+
+    def eval_Identificadores(self, nodo, entorno):
+        return entorno.obtener(nodo.nombre)
+
+    def eval_OperacionBinaria(self, nodo, entorno):
+        izq = self.evaluar(nodo.izquierda, entorno)
+        der = self.evaluar(nodo.derecha, entorno)
+        return self.aplicar_operador(nodo.operador, izq, der)
+
+    def eval_OperacionUnaria(self, nodo, entorno):
+        valor = self.evaluar(nodo.operando, entorno)
+        if nodo.operador == '!':
+            return not valor
+        if nodo.operador == '-':
+            return -valor
+
+    def eval_Arreglo(self, nodo, entorno):
+        return [self.evaluar(e, entorno) for e in nodo.elementos]
+
+    def eval_AccesoIndice(self, nodo, entorno):
+        arreglo = self.evaluar(nodo.arreglo, entorno)
+        indice = self.evaluar(nodo.indice, entorno)
+        return arreglo[indice]
+
+    def eval_LlamadaFuncion(self, nodo, entorno):
+        argumentos = [self.evaluar(a, entorno) for a in nodo.argumentos]
+
+        if nodo.nombre == 'println!':
+            if len(argumentos) == 1:
+                print(argumentos[0])
+            else:
+                plantilla = argumentos[0]
+                resto = argumentos[1:]
+                for val in resto:
+                    plantilla = plantilla.replace('{}', str(val), 1)
+                print(plantilla)
+            return None
+
+        return self.llamar_funcion(nodo.nombre, argumentos)
+
+    def aplicar_operador(self, operador, izq, der):
+        if operador == '+': return izq + der
+        if operador == '-': return izq - der
+        if operador == '*': return izq * der
+        if operador == '/': return izq / der
+        if operador == '%': return izq % der
+        if operador == '==': return izq == der
+        if operador == '!=': return izq != der
+        if operador == '<': return izq < der
+        if operador == '>': return izq > der
+        if operador == '<=': return izq <= der
+        if operador == '>=': return izq >= der
+        if operador == '&&': return izq and der
+        if operador == '||': return izq or der
+        raise Exception(f"Operador no soportado: {operador}")
+
+
+
+# para PRUEBASS
+if __name__ == '__main__':
+    from lexer import lexer
+    from parser import parser
+
+    codigo = '''
+    fn main() {
+        let mut x: i32 = 10;
+        if x > 5 {
+            println!("es mayor a 5");
+        }
+        while x > 0 {
+            println!(x);
+            x -= 1;
+        }
+    }
+    '''
+
+    ast = parser.parse(codigo, lexer=lexer)
+    interprete = Interprete()
+    interprete.ejecutar_programa(ast)
