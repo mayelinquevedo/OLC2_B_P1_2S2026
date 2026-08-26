@@ -253,7 +253,11 @@ class Interprete:
         if operador == '+': return izq + der
         if operador == '-': return izq - der
         if operador == '*': return izq * der
-        if operador == '/': return izq / der
+        if operador == '/':
+            resultado = izq / der
+            if isinstance(izq, int) and isinstance(der, int):
+                return int(resultado)
+            return resultado
         if operador == '%': return izq % der
         if operador == '==': return izq == der
         if operador == '!=': return izq != der
