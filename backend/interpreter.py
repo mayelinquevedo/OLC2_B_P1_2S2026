@@ -172,6 +172,10 @@ class Interprete:
                 self.ejecutar_sentencia_o_expr(caso.cuerpo, entorno)
                 return
 
+    def ejec_Bloque(self, nodo, entorno):
+        self.ejecutar_bloque(nodo.sentencias, Entorno(padre=entorno))
+
+
     def ejecutar_sentencia_o_expr(self, nodo, entorno):
         if isinstance(nodo, LlamadaFuncion):
             self.evaluar(nodo, entorno)
@@ -241,6 +245,7 @@ class Interprete:
         if operador == '||': return izq or der
         raise Exception(f"Operador no soportado: {operador}")
 
+    
 
 
 # para PRUEBASS

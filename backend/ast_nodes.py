@@ -46,6 +46,14 @@ class OperacionBinaria(Nodo):
 
 
 
+
+class Bloque(Nodo):
+    def __init__(self, sentencias):
+        self.sentencias =  sentencias
+
+    def __repr__(self):
+        return f"Bloque({self.sentencias})"
+
 #SENTENCIA if/if else
 class If(Nodo):
     def __init__(self, condicion, bloque_si, bloque_sino=None):

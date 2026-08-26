@@ -60,6 +60,13 @@ def p_expresion_string(p):
     'expresion : STRING'
     p[0] = Literal(p[1], 'String')
 
+def p_expresion_string_from(p):
+    'expresion : TIPO_STRING DOS_PUNTOS DOS_PUNTOS IDENTIFICADOR PAREN_IZQ lista_argumentos PAREN_DER'
+    if p[4] == 'from' and len(p[6]) > 0:
+        p[0] = p[6][0]
+    else:
+        p[0] = Literal('', 'String')
+    
 def p_expresion_true(p):
     'expresion : TRUE'
     p[0] = Literal(True, 'bool')
@@ -68,11 +75,29 @@ def p_expresion_false(p):
     'expresion : FALSE'
     p[0] = Literal(False, 'bool')
 
+def p_expresion_char(p):
+    'expresion : CHAR'
+    p[0] = Literal(p[1], 'char')
+
+
+def p_expresion_metodo(p):
+    'expresion : expresion PUNTO IDENTIFICADOR PAREN_IZQ lista_argumentos PAREN_DER'
+    p[0] = LlamadaFuncion(p[3], [p[1]] + p[5])
+
+
+
+
 
 # Bloque de sentencias { ... }
 def p_bloque(p):
     'bloque : LLAVE_IZQ lista_sentencias LLAVE_DER'
     p[0] = p[2]
+
+
+def p_sentencia_bloque(p):
+    'sentencia : bloque'
+    p[0] = Bloque(p[1])
+
 
 def p_lista_sentencias_multiple(p):
     'lista_sentencias : lista_sentencias sentencia'
@@ -86,6 +111,9 @@ def p_lista_sentencias_vacia(p):
     'lista_sentencias : '
     p[0] = []
 
+def p_sentencia_metodo(p):
+    'sentencia : expresion PUNTO IDENTIFICADOR PAREN_IZQ lista_argumentos PAREN_DER PUNTO_COMA'
+    p[0] = LlamadaFuncion(p[3], [p[1]] + p[5] )
 
 # Asignacion (reasignar variable existente)
 def p_sentencia_asignacion(p):
@@ -380,18 +408,12 @@ if __name__ == '__main__':
 
     codigo = '''
     fn main() {
-        let numeros: [i32; 3] = [1, 2, 3];
-        let primero = numeros[0];
-
-        match primero {
-            1 => println!("uno"),
-            _ => println!("otro"),
-        }
+        let caracter: char = 'A';
+        let texto = String::from("Hola");
+        let numeros = [10, 20, 30];
+        println!("{}", numeros.len());
     }
     '''
 
     resultado = parser.parse(codigo, lexer=lexer)
     print(resultado)
-
-    if resultado is not None:
-        generar_ast(resultado, "backend/reports/prueba_arreglos_match")
