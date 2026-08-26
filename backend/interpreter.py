@@ -216,11 +216,31 @@ class Interprete:
                 print(self.formatear_valor(argumentos[0]))
             else:
                 plantilla = argumentos[0]
-                resto = argumentos[1:]
-                for val in resto:
+                for val in argumentos[1:]:
                     plantilla = plantilla.replace('{}', self.formatear_valor(val), 1)
                 print(plantilla)
             return None
+
+        if nodo.nombre == 'len':
+            return len(argumentos[0])
+        if nodo.nombre == 'contains':
+            return argumentos[1] in argumentos[0]
+        if nodo.nombre == 'replace':
+            return argumentos[0].replace(argumentos[1], argumentos[2])
+        if nodo.nombre == 'to_uppercase':
+            return argumentos[0].upper()
+        if nodo.nombre == 'to_lowercase':
+            return argumentos[0].lower()
+        if nodo.nombre == 'split':
+            return argumentos[0].split(argumentos[1])
+        if nodo.nombre == 'reverse':
+            argumentos[0].reverse()
+            return None
+        if nodo.nombre == 'typeof':
+            return type(argumentos[0]).__name__
+        if nodo.nombre == 'random':
+            import random as random_mod
+            return random_mod.randint(argumentos[0], argumentos[1])
 
         return self.llamar_funcion(nodo.nombre, argumentos)
 
@@ -255,14 +275,11 @@ if __name__ == '__main__':
 
     codigo = '''
     fn main() {
-        let mut x: i32 = 10;
-        if x > 5 {
-            println!("es mayor a 5");
-        }
-        while x > 0 {
-            println!(x);
-            x -= 1;
-        }
+        let caracter: char = 'A';
+        let texto = String::from("Hola");
+        let numeros = [10, 20, 30];
+        println!("{}", numeros.len());
+        println!("{}", texto.to_uppercase());
     }
     '''
 
