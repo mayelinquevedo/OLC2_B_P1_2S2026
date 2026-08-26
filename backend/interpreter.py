@@ -217,7 +217,10 @@ class Interprete:
             else:
                 plantilla = argumentos[0]
                 for val in argumentos[1:]:
-                    plantilla = plantilla.replace('{}', self.formatear_valor(val), 1)
+                    if '{:?}' in plantilla:
+                        plantilla = plantilla.replace('{:?}', self.formatear_debug(val), 1)
+                    else:
+                        plantilla = plantilla.replace('{}', self.formatear_valor(val), 1)
                 print(plantilla)
             return None
 
@@ -237,7 +240,16 @@ class Interprete:
             argumentos[0].reverse()
             return None
         if nodo.nombre == 'typeof':
-            return type(argumentos[0]).__name__
+            valor = argumentos[0]
+            if isinstance(valor, bool):
+                return 'bool'
+            if isinstance(valor, int):
+                return 'i32'
+            if isinstance(valor, float):
+                return 'f64'
+            if isinstance(valor, str):
+                return 'String'
+            return type(valor).__name__
         if nodo.nombre == 'random':
             import random as random_mod
             return random_mod.randint(argumentos[0], argumentos[1])
@@ -248,6 +260,11 @@ class Interprete:
         if isinstance(valor, bool):
             return 'true' if valor else 'false'
         return str(valor)
+
+    def formatear_debug(self, valor):
+        if isinstance(valor, list):
+            return '[' + ', '.join(self.formatear_valor(v) for v in valor) + ']'
+        return self.formatear_valor(valor)
 
     def aplicar_operador(self, operador, izq, der):
         if operador == '+': return izq + der
@@ -279,11 +296,10 @@ if __name__ == '__main__':
 
     codigo = '''
     fn main() {
-        let caracter: char = 'A';
-        let texto = String::from("Hola");
+        let texto = String::from("Hola Mundo");
+        println!("{}", typeof(texto));
         let numeros = [10, 20, 30];
-        println!("{}", numeros.len());
-        println!("{}", texto.to_uppercase());
+        println!("{:?}", numeros);
     }
     '''
 
