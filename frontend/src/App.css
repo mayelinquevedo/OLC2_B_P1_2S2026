@@ -1,7 +1,26 @@
-.app-container {
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
   font-family: sans-serif;
-  max-width: 1000px;
-  margin: 0 auto;
+  overflow-x: hidden;
+  background-color: #ffffff;
+}
+
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   padding: 20px;
 }
 
@@ -9,17 +28,31 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+
+.app-header h2 {
+  margin: 0;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
 }
 
 .app-header button {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #2563eb;
+  background-color: #02a884;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.app-header button:hover {
+  background-color: #1d4ed8;
 }
 
 .app-header button:disabled {
@@ -27,25 +60,35 @@
   cursor: not-allowed;
 }
 
+
+/*EDITOR + SALIDA*/
+.workspace {
+  display: flex;
+  width: 100%;
+  height: 65vh;
+  min-height: 500px;
+  gap: 12px;
+}
+
+/*EDITOR*/
 .editor-container {
+  width: 45%;
+  height: 100%;
   border: 1px solid #ccc;
   border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 20px;
+  background-color: #1e1e1e;
 }
 
+
+/* SALIDA */
 .consola-container {
+  width: 55%;
+  height: 100%;
   background-color: #1e1e1e;
   color: #d4d4d4;
-  padding: 15px;
   border-radius: 6px;
-  min-height: 150px;
-}
-
-.consola-container h3 {
-  margin-top: 0;
-  color: #aaa;
-  font-size: 14px;
+  overflow: auto;
 }
 
 .consola-salida {
@@ -53,8 +96,140 @@
   font-family: "Consolas", monospace;
   font-size: 14px;
   margin: 0;
+  padding: 15px;
 }
 
 .consola-error {
   color: #f87171;
+}
+
+
+/* TÍTULOS DE PANELES  */
+.panel-title {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  background-color: #252526;
+  color: #cccccc;
+  font-size: 14px;
+  border-bottom: 1px solid #3e3e42;
+}
+
+
+/* PANEL */
+.compiler-panel {
+  margin-top: 15px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+
+/* TABS*/
+.compiler-tabs {
+  display: flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  padding: 12px 18px;
+  font-size: 14px;
+  color: #4b5563;
+  cursor: pointer;
+  border-right: 1px solid #e5e7eb;
+}
+
+.tab:hover {
+  background-color: #e5e7eb;
+}
+
+.tab.activo {
+  background-color: #ffffff;
+  color: #2563eb;
+  font-weight: bold;
+  border-bottom: 2px solid #2563eb;
+}
+
+/*BOTÓN CONTRAER*/
+.collapse-button {
+  margin-left: auto;
+  height: 100%;
+  padding: 0 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #4b5563;
+  font-size: 15px;
+}
+
+.collapse-button:hover {
+  background-color: #e5e7eb;
+}
+
+
+/*CONTENIDO*/
+.compiler-content {
+  min-height: 220px;
+  max-height: 350px;
+  overflow: auto;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.data-section h3,
+.ast-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #374151;
+}
+
+
+/*TABLAS */
+.data-section table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-section th {
+  background-color: #f3f4f6;
+  text-align: left;
+  font-weight: bold;
+  color: #374151;
+}
+
+.data-section th,
+.data-section td {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+}
+
+.data-section tr:hover {
+  background-color: #f9fafb;
+}
+
+
+/*AST*/
+.ast-section {
+  width: 100%;
+}
+
+.ast-tree {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  padding: 20px;
+  border-radius: 6px;
+  font-family: "Consolas", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 0;
 }

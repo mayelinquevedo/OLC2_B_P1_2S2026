@@ -19,6 +19,7 @@ CORS(app)
 def ejecutar():
     datos = request.get_json() # JSON que mando el front
     codigo = datos.get('codigo', '')
+    lexer.lineno = 1   
     salida_consola = io.StringIO()
     salida_original = sys.stdout
 

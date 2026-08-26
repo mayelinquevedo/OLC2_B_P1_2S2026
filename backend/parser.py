@@ -375,8 +375,6 @@ def p_declaracion_variable_mut_inferida(p):
     'sentencia : LET MUT IDENTIFICADOR IGUAL expresion PUNTO_COMA'
     p[0] = DeclaracionVariable(p[3], None, p[5], mutable=True)
 
-
-
 # solo tipo, sin valor inicial
 def p_declaracion_variable_sin_valor(p):
     'sentencia : LET IDENTIFICADOR DOS_PUNTOS tipo PUNTO_COMA'
