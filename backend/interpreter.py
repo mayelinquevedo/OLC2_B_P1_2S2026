@@ -91,8 +91,23 @@ class Interprete:
         return metodo(nodo, entorno)
 
     def ejec_DeclaracionVariable(self, nodo, entorno):
-        valor = self.evaluar(nodo.valor, entorno) if nodo.valor is not None else None
-        entorno.declarar(nodo.nombre, valor)
+        if nodo.valor is not None:
+            valor = self.evaluar(nodo.valor, entorno) 
+        else:
+            valor = self.valor_por_defecto(nodo.tipo)
+        entorno.declarar(nodo.nombre, valor)    
+
+    # VALOR_POR_DEFECTO 
+    def valor_por_defecto(self, tipo):
+        if tipo == 'i32':
+            return 0
+        if tipo == 'f64':
+            return 0.0
+        if tipo == 'bool':
+            return False
+        if tipo == 'String':
+            return ""
+        return None
 
     def ejec_Asignacion(self, nodo, entorno):
         valor_nuevo = self.evaluar(nodo.valor, entorno)
@@ -194,16 +209,21 @@ class Interprete:
 
         if nodo.nombre == 'println!':
             if len(argumentos) == 1:
-                print(argumentos[0])
+                print(self.formatear_valor(argumentos[0]))
             else:
                 plantilla = argumentos[0]
                 resto = argumentos[1:]
                 for val in resto:
-                    plantilla = plantilla.replace('{}', str(val), 1)
+                    plantilla = plantilla.replace('{}', self.formatear_valor(val), 1)
                 print(plantilla)
             return None
 
         return self.llamar_funcion(nodo.nombre, argumentos)
+
+    def formatear_valor(self, valor):
+        if isinstance(valor, bool):
+            return 'true' if valor else 'false'
+        return str(valor)
 
     def aplicar_operador(self, operador, izq, der):
         if operador == '+': return izq + der
