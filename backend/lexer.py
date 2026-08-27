@@ -1,4 +1,5 @@
 import ply.lex as lex
+from errors import agregar_error, encontrar_columna
 
 #palabras reservadas del lenguaje
 reservadas = {
@@ -195,7 +196,7 @@ def t_COMENTARIO_BLOQUE(t):
 #COMENTARIO DE BLOQUE SIN CERRAR 
 def t_COMENTARIO_BLOQUE_SIN_CERRAR(t):
     r'/\*(.|\n)*'
-    print(f"[Error Léxico] Línea {t.lineno}: Comentario de bloque sin cerrar (falta '*/')")
+    agregar_error("Lexico", "Comentario de bloque sin cerrar (falta '*/')", t.lineno)
     t.lexer.lineno += t.value.count('\n')
     pass
 
@@ -210,8 +211,11 @@ def t_newline(t):
 
 
 #manejo de errores léxicos
+
+
 def t_error(t):
-    print(f"[Error Léxico] Línea {t.lineno}: Caracter no reconocido '{t.value[0]}'")
+    columna = encontrar_columna(t.lexer.lexdata, t.lexpos)
+    agregar_error("Lexico", f"Caracter no reconocido '{t.value[0]}'", t.lineno, columna)
     t.lexer.skip(1)
 
 lexer = lex.lex()

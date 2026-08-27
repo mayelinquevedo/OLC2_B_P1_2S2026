@@ -3,62 +3,113 @@ from flask import Flask, request, jsonify #flask, request (datos de la peticion)
 from flask_cors import CORS #CORS, para permitir peticiones desde el front
 import io   #io, para capturar la salida de los print() en memoria
 import sys #sys, para poder redirigir temporalmente sys.stdout
-
+import base64
 
 from lexer import lexer #lexer ya construido
 from parser import parser #parser ya construido
 from interpreter import Interprete #clase Interprete (aun sin instanciar)
-
+from errors import limpiar_errores, obtener_errores
+from reports.symbol_table import construir_tabla_simbolos
+from reports.ast_tree import generar_ast
+import os
 
 app = Flask(__name__)
 CORS(app)
 
+def obtener_tokens(codigo):
+    """Tokeniza el codigo por separado, para el reporte de tokens"""
+    lex_temporal = lexer.clone()
+    lex_temporal.lineno = 1
+    lex_temporal.input(codigo)
+    tokens_lista = []
+    while True:
+        tok = lex_temporal.token()
+        if not tok:
+            break
+        tokens_lista.append({
+            "lexema": str(tok.value),
+            "token": tok.type,
+            "linea": tok.lineno,
+        })
+    return tokens_lista
 
-# /ejecutar, solo  peticiones POST
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 @app.route('/ejecutar', methods=['POST'])
 def ejecutar():
-    datos = request.get_json() # JSON que mando el front
+    datos = request.get_json()
     codigo = datos.get('codigo', '')
-    lexer.lineno = 1   
+
+    limpiar_errores()
+    lexer.lineno = 1
+
     salida_consola = io.StringIO()
     salida_original = sys.stdout
 
+    tokens_reporte = obtener_tokens(codigo)
+    tabla_simbolos = []
+    ast_base64 = None
+
     try:
         sys.stdout = salida_consola
-        ast = parser.parse(codigo, lexer=lexer)   #pasa el codigo por el parser
-        if ast is None:    #si el parser no logro construir el arbol, hubo un error de sintaxis
+        ast = parser.parse(codigo, lexer=lexer)
+
+        if ast is None:
+            sys.stdout = salida_original
             return jsonify({
                 'exito': False,
                 'salida': '',
-                'error': 'Error de sintaxis en el codigo fuente.'
+                'error': 'Error de sintaxis en el codigo fuente.',
+                'errores': obtener_errores(),
+                'tokens': tokens_reporte,
+                'tabla_simbolos': [],
+                'ast_imagen': None,
             })
 
-        #creamos un interprete nuevo (uno por cada peticion) y ejecutamos
+        tabla_simbolos = construir_tabla_simbolos(ast)
+
         interprete = Interprete()
         interprete.ejecutar_programa(ast)
 
-        #recuperamos todo el texto que se imprimio durante la ejecucion
         resultado = salida_consola.getvalue()
+        sys.stdout = salida_original   # restauramos ANTES de generar el AST
+
+        # Generamos el AST fuera de la captura de stdout, con ruta absoluta
+        try:
+            ruta_ast = os.path.join(BASE_DIR, "reports", "ast_actual")
+            generar_ast(ast, ruta_ast)
+            with open(ruta_ast + ".png", "rb") as f:
+                ast_base64 = base64.b64encode(f.read()).decode('utf-8')
+        except Exception as e:
+            print(f"No se pudo generar AST: {e}")
+            ast_base64 = None
+
         return jsonify({
             'exito': True,
             'salida': resultado,
-            'error': None
+            'error': None,
+            'errores': obtener_errores(),
+            'tokens': tokens_reporte,
+            'tabla_simbolos': tabla_simbolos,
+            'ast_imagen': ast_base64,
         })
 
-    #si algo truena durante la ejecucion
     except Exception as e:
-        #recuperamos lo que si alcanzo a imprimirse antes del error
         resultado_parcial = salida_consola.getvalue()
         return jsonify({
             'exito': False,
             'salida': resultado_parcial,
-            'error': str(e)
+            'error': str(e),
+            'errores': obtener_errores(),
+            'tokens': tokens_reporte,
+            'tabla_simbolos': tabla_simbolos,
+            'ast_imagen': ast_base64,
         })
 
-    #esto ejecuta siempre, haya error o no
     finally:
         sys.stdout = salida_original
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

@@ -7,6 +7,7 @@ import ply.yacc as yacc
 from lexer import tokens  #llamda a tokens, los qe se definieron en el lexer.py
 from ast_nodes import *   #  nodos del AST
 from reports.ast_tree import generar_ast
+from errors import agregar_error, encontrar_columna
 
 
 start = 'programa' #solo para algunas pruebas iniciales   
@@ -366,11 +367,10 @@ def p_expresion_acceso_campo(p):
 #  errores sintacticos
 def p_error(p):
     if p:
-        print(f"[Error Sintactico] Linea {p.lineno}: token inesperado '{p.value}'")
+        columna = encontrar_columna(p.lexer.lexdata, p.lexpos)
+        agregar_error("Sintactico", f"Token inesperado '{p.value}'", p.lineno, columna)
     else:
-        print("[Error Sintactico] Fin de archivo inesperado")
-
-
+        agregar_error("Sintactico", "Fin de archivo inesperado", 0)
 
 
 # Declaracion de variables (let / let mut)
