@@ -19,7 +19,8 @@ precedence = (
     ('left', 'MENORQUE', 'MAYORQUE', 'MENOR_IGUAL', 'MAYOR_IGUAL'),
     ('left', 'MAS', 'MENOS'),
     ('left', 'MULT', 'DIV', 'MODULO'),
-    ('right', 'NOT'),     #prioridad más alta
+    ('right', 'NOT'),     
+    ('left', 'PUNTO'), #prioridad mas alta
 )
 
 # Expresiones: operaciones binarias
@@ -437,3 +438,5 @@ if __name__ == '__main__':
 
     resultado = parser.parse(codigo, lexer=lexer)
     print(resultado)
+
+

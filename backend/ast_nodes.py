@@ -208,17 +208,19 @@ class Programa(Nodo):
 
 #ESTE ES SOLO PARA PRUEBAS
 if __name__ == '__main__':
-    lit = Literal(10, 'i32')
-    print(lit)
+    from lexer import lexer
+    from parser import parser
 
-    ident = Identificadores('x')
-    print(ident)
+    codigo = '''
+    fn main() {
+        let numeros = [10, 20, 30];
+        let mut i = 0;
+        while i < numeros.len() {
+            println!("{}", numeros[i]);
+            i = i + 1;
+        }
+    }
+    '''
 
-    suma = OperacionBinaria(Literal(10, 'i32'), '+', Literal(5, 'i32'))
-    decl = DeclaracionVariable('x', 'i32', suma, mutable=False)
-    print(decl)
-
-    condicion = OperacionBinaria(Identificadores('x'), '>', Literal(5, 'i32'))
-    llamada = LlamadaFuncion('println!', [Literal('mayor', 'String')])
-    sentencia_if = If(condicion, [llamada])
-    print(sentencia_if)
+    ast = parser.parse(codigo, lexer=lexer)
+    print(ast)
