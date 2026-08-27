@@ -8,7 +8,7 @@ from lexer import tokens  #llamda a tokens, los qe se definieron en el lexer.py
 from ast_nodes import *   #  nodos del AST
 from reports.ast_tree import generar_ast
 from errors import agregar_error, encontrar_columna
-
+from errors import agregar_error
 
 start = 'programa' #solo para algunas pruebas iniciales   
 
@@ -96,6 +96,11 @@ def p_bloque(p):
     'bloque : LLAVE_IZQ lista_sentencias LLAVE_DER'
     p[0] = p[2]
 
+def p_sentencia_error(p):
+    'sentencia : error PUNTO_COMA'
+    linea = p.lineno(2)
+    agregar_error("Sintactico", "Sentencia invalida, se omitio hasta el siguiente ';'.", linea)
+    p[0] = None  # nodo vacio, se ignora al ejecutar
 
 def p_sentencia_bloque(p):
     'sentencia : bloque'
@@ -104,11 +109,14 @@ def p_sentencia_bloque(p):
 
 def p_lista_sentencias_multiple(p):
     'lista_sentencias : lista_sentencias sentencia'
-    p[0] = p[1] + [p[2]]
+    if p[2] is not None:
+        p[0] = p[1] + [p[2]]
+    else:
+        p[0] = p[1]
 
 def p_lista_sentencias_una(p):
     'lista_sentencias : sentencia'
-    p[0] = [p[1]]
+    p[0] = [p[1]] if p[1] is not None else []
 
 def p_lista_sentencias_vacia(p):
     'lista_sentencias : '
