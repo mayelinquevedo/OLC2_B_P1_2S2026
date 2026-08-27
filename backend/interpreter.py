@@ -203,10 +203,24 @@ class Interprete:
     def eval_Arreglo(self, nodo, entorno):
         return [self.evaluar(e, entorno) for e in nodo.elementos]
 
+    def eval_StructInit(self, nodo, entorno):
+    # struct como un diccionario de Python: {campo: valor}
+        resultado = {}
+        for nombre_campo, valor_nodo in nodo.valor:
+            if isinstance(valor_nodo, StructInit):
+                resultado[nombre_campo] = self.eval_StructInit(valor_nodo, entorno)
+            else:
+                resultado[nombre_campo] = self.evaluar(valor_nodo, entorno)
+        return resultado
+
     def eval_AccesoIndice(self, nodo, entorno):
-        arreglo = self.evaluar(nodo.arreglo, entorno)
-        indice = self.evaluar(nodo.indice, entorno)
-        return arreglo[indice]
+        contenedor = self.evaluar(nodo.arreglo, entorno)
+        indice = nodo.indice
+        if isinstance(indice, str):
+            return contenedor[indice]
+        else:
+            indice_valor = self.evaluar(indice, entorno)
+            return contenedor[indice_valor]
 
     def eval_LlamadaFuncion(self, nodo, entorno):
         argumentos = [self.evaluar(a, entorno) for a in nodo.argumentos]

@@ -93,7 +93,9 @@ def t_NUMERO_ENTERO(t):
 #Strings (cadena texto entre comillas dobles " " )
 def t_STRING(t):
     r'"([^"\\]|\\.)*"'
-    t.value = t.value[1:-1]  # quitar las comillas dobles al inicio y del final
+    contenido = t.value[1:-1]
+    contenido = contenido.replace('\\n', '\n').replace('\\"', '"').replace('\\\\', '\\')
+    t.value = contenido
     return t
 
 
