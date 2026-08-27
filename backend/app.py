@@ -4,7 +4,7 @@ from flask_cors import CORS #CORS, para permitir peticiones desde el front
 import io   #io, para capturar la salida de los print() en memoria
 import sys #sys, para poder redirigir temporalmente sys.stdout
 import base64
-
+from semantic import AnalizadorSemantico
 from lexer import lexer #lexer ya construido
 from parser import parser #parser ya construido
 from interpreter import Interprete #clase Interprete (aun sin instanciar)
@@ -17,23 +17,24 @@ app = Flask(__name__)
 CORS(app)
 
 def obtener_tokens(codigo):
-    """Tokeniza el codigo por separado, para el reporte de tokens"""
     lex_temporal = lexer.clone()
     lex_temporal.lineno = 1
+
+    from errors import lista_errores
+    respaldo = list(lista_errores)
+
     lex_temporal.input(codigo)
     tokens_lista = []
     while True:
         tok = lex_temporal.token()
         if not tok:
             break
-        tokens_lista.append({
-            "lexema": str(tok.value),
-            "token": tok.type,
-            "linea": tok.lineno,
-        })
+        tokens_lista.append({"lexema": str(tok.value), "token": tok.type, "linea": tok.lineno})
+
+    lista_errores.clear()
+    lista_errores.extend(respaldo)
+
     return tokens_lista
-
-
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -69,7 +70,8 @@ def ejecutar():
             })
 
         tabla_simbolos = construir_tabla_simbolos(ast)
-
+        analizador = AnalizadorSemantico()
+        analizador.analizar(ast)
         interprete = Interprete()
         interprete.ejecutar_programa(ast)
 
