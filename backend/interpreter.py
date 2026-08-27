@@ -296,10 +296,12 @@ if __name__ == '__main__':
 
     codigo = '''
     fn main() {
-        let texto = String::from("Hola Mundo");
-        println!("{}", typeof(texto));
-        let numeros = [10, 20, 30];
-        println!("{:?}", numeros);
+        let x: i32 = 10;
+        if x > 5 {
+            println!("mayor");
+        } else {
+            println!("menor");
+        }
     }
     '''
 

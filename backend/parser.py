@@ -239,17 +239,26 @@ def p_parametro(p):
     p[0] = (p[1], p[3])
 
 # Programa completo: una o mas funciones
+# Programa completo: una o mas funciones O structs, en cualquier orden
 def p_programa(p):
-    'programa : lista_funciones'
+    'programa : lista_declaraciones'
     p[0] = Programa(p[1])
 
-def p_lista_funciones_multiple(p):
-    'lista_funciones : lista_funciones funcion'
+def p_lista_declaraciones_multiple(p):
+    'lista_declaraciones : lista_declaraciones declaracion_top'
     p[0] = p[1] + [p[2]]
 
-def p_lista_funciones_una(p):
-    'lista_funciones : funcion'
+def p_lista_declaraciones_una(p):
+    'lista_declaraciones : declaracion_top'
     p[0] = [p[1]]
+
+def p_declaracion_top_funcion(p):
+    'declaracion_top : funcion'
+    p[0] = p[1]
+
+def p_declaracion_top_struct(p):
+    'declaracion_top : STRUCT IDENTIFICADOR LLAVE_IZQ lista_campos LLAVE_DER'
+    p[0] = StructDecl(p[2], p[4])
 
 
 # Arreglos y acceso por indice
@@ -299,13 +308,15 @@ def p_caso_match_comodin(p):
 
 
 # Structs
-def p_struct_decl(p):
-    'sentencia : STRUCT IDENTIFICADOR LLAVE_IZQ lista_campos LLAVE_DER'
-    p[0] = StructDecl(p[2], p[4])
+
 
 def p_lista_campos_multiple(p):
-    'lista_campos : lista_campos COMA campo'
-    p[0] = p[1] + [p[3]]
+    '''lista_campos : lista_campos COMA campo
+                     | lista_campos COMA'''
+    if len(p) == 4:
+        p[0] = p[1] + [p[3]]
+    else:
+        p[0] = p[1]
 
 def p_lista_campos_uno(p):
     'lista_campos : campo'
@@ -325,16 +336,24 @@ def p_declaracion_struct_init(p):
     p[0] = DeclaracionVariable(p[2], p[4], StructInit(p[4], p[6]), mutable=False)
 
 def p_lista_valores_multiple(p):
-    'lista_valores : lista_valores COMA valor_campo'
-    p[0] = p[1] + [p[3]]
+    '''lista_valores : lista_valores COMA valor_campo
+                      | lista_valores COMA'''
+    if len(p) == 4:
+        p[0] = p[1] + [p[3]]
+    else:
+        p[0] = p[1]
 
 def p_lista_valores_uno(p):
     'lista_valores : valor_campo'
     p[0] = [p[1]]
 
 def p_valor_campo(p):
-    'valor_campo : IDENTIFICADOR DOS_PUNTOS expresion'
-    p[0] = (p[1], p[3])
+    '''valor_campo : IDENTIFICADOR DOS_PUNTOS expresion
+                    | IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR LLAVE_IZQ lista_valores LLAVE_DER'''
+    if len(p) == 4:
+        p[0] = (p[1], p[3])
+    else:
+        p[0] = (p[1], StructInit(p[3], p[5]))
 
 
 # Acceso a campo de struct 
@@ -391,7 +410,8 @@ def p_tipo(p):
             | TIPO_F64
             | TIPO_BOOL
             | TIPO_CHAR
-            | TIPO_STRING'''
+            | TIPO_STRING
+            | IDENTIFICADOR'''
     p[0] = p[1]
 
 # parser
@@ -406,10 +426,12 @@ if __name__ == '__main__':
 
     codigo = '''
     fn main() {
-        let caracter: char = 'A';
-        let texto = String::from("Hola");
-        let numeros = [10, 20, 30];
-        println!("{}", numeros.len());
+        let x: i32 = 10;
+        if x > 5 {
+            println!("mayor");
+        } else {
+            println!("menor");
+        }
     }
     '''
 
