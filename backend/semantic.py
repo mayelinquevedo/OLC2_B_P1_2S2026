@@ -86,7 +86,7 @@ class AnalizadorSemantico:
                 agregar_error(
                     "Semantico",
                     f"No es posible asignar un valor de tipo {tipo_inferido} a una variable de tipo {nodo.tipo}.",
-                    0
+                    nodo.linea
                 )
                 self.tiene_errores = True
 
@@ -94,7 +94,8 @@ class AnalizadorSemantico:
 
     def rev_Asignacion(self, nodo):
         if not self.tabla.existe(nodo.nombre):
-            agregar_error("Semantico", f"La variable '{nodo.nombre}' no ha sido declarada.", 0)
+            agregar_error("Semantico", f"La variable '{nodo.nombre}' no ha sido declarada.", nodo.linea)
+
             self.tiene_errores = True
         else:
             simbolo = self.tabla.obtener(nodo.nombre)
@@ -146,7 +147,7 @@ class AnalizadorSemantico:
     def revisar_expresion(self, nodo):
         if isinstance(nodo, Identificadores):
             if not self.tabla.existe(nodo.nombre):
-                agregar_error("Semantico", f"La variable '{nodo.nombre}' no ha sido declarada.", 0)
+                agregar_error("Semantico", f"La variable '{nodo.nombre}' no ha sido declarada.", nodo.linea)
                 self.tiene_errores = True
         elif isinstance(nodo, OperacionBinaria):
             self.revisar_expresion(nodo.izquierda)

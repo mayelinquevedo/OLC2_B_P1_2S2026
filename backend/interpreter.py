@@ -281,9 +281,14 @@ class Interprete:
         return self.formatear_valor(valor)
 
     def aplicar_operador(self, operador, izq, der):
-        if operador == '+': return izq + der
-        if operador == '-': return izq - der
-        if operador == '*': return izq * der
+        if operador == '+':
+            return izq + der  
+        if operador == '-':
+            return izq - der
+        if operador == '*':
+            if isinstance(izq, str) or isinstance(der, str):
+                return izq * der
+            return izq * der
         if operador == '/':
             resultado = izq / der
             if isinstance(izq, int) and isinstance(der, int):
@@ -299,8 +304,6 @@ class Interprete:
         if operador == '&&': return izq and der
         if operador == '||': return izq or der
         raise Exception(f"Operador no soportado: {operador}")
-
-    
 
 
 # para PRUEBASS

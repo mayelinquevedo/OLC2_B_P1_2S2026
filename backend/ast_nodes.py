@@ -2,6 +2,7 @@
 #para identificar cualquier pieza del arbol
 class Nodo:
     pass
+    linea = 0
 
 #nodos: Valores literales e identificadores (hojas)
 class Literal(Nodo):

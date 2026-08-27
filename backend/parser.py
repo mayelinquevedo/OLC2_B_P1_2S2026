@@ -47,8 +47,9 @@ def p_expresion_agrupacion(p):
 
 def p_expresion_identificador(p):
     'expresion : IDENTIFICADOR'
-    p[0] = Identificadores(p[1])
-
+    nodo = Identificadores(p[1])
+    nodo.linea = p.lineno(1)
+    p[0] = nodo
 #Expresiones literales.
 def p_expresion_numero_entero(p):
     'expresion : NUMERO_ENTERO'
@@ -125,8 +126,9 @@ def p_sentencia_asignacion(p):
                   | IDENTIFICADOR MULT_IGUAL expresion PUNTO_COMA
                   | IDENTIFICADOR DIV_IGUAL expresion PUNTO_COMA
                   | IDENTIFICADOR MODULO_IGUAL expresion PUNTO_COMA'''
-    p[0] = Asignacion(p[1], p[2], p[3])
-
+    nodo = Asignacion(p[1], p[2], p[3])
+    nodo.linea = p.lineno(1)
+    p[0] = nodo
 
 # println! y llamadas a funcion
 def p_sentencia_llamada(p):
@@ -378,7 +380,9 @@ def p_error(p):
 #   con tipo explicito y valor
 def p_declaracion_variable_completa(p):
     'sentencia : LET IDENTIFICADOR DOS_PUNTOS tipo IGUAL expresion PUNTO_COMA'
-    p[0] = DeclaracionVariable(p[2], p[4], p[6], mutable=False)
+    nodo = DeclaracionVariable(p[2], p[4], p[6], mutable=False)
+    nodo.linea = p.lineno(1)  # linea del token LET
+    p[0] = nodo
 
 def p_declaracion_variable_mut_completa(p):
     'sentencia : LET MUT IDENTIFICADOR DOS_PUNTOS tipo IGUAL expresion PUNTO_COMA'
