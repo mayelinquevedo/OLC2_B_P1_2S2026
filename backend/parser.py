@@ -10,7 +10,7 @@ from reports.ast_tree import generar_ast
 from errors import agregar_error, encontrar_columna
 from errors import agregar_error
 
-start = 'programa' #solo para algunas pruebas iniciales   
+start = 'programa' 
 
 #Precedencia de operadores (tomando en cuenta de menor a mayor prioridad)
 precedence = (
