@@ -102,8 +102,8 @@ Limitaciones conocidas: slices de arreglos (`&arr[1..4]`) y raw strings (`r"..."
 
 ## Documentación
 
-- 📘 [Documentación técnica](documentacion/Manual_Tecnico.md) — gramática formal, arquitectura, decisiones de diseño y desafíos técnicos
-- 📗 [Manual de usuario](documentacion/Manual_Usuario.md) — guía de instalación y uso de la interfaz, con capturas de pantalla
+-  [Documentación técnica](documentacion/Manual_Tecnico.md) — gramática formal, arquitectura, decisiones de diseño y desafíos técnicos
+-  [Manual de usuario](documentacion/Manual_Usuario.md) — guía de instalación y uso de la interfaz, con capturas de pantalla
 
 ---
 
