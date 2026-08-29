@@ -19,7 +19,6 @@ CORS(app)
 def obtener_tokens(codigo):
     lex_temporal = lexer.clone()
     lex_temporal.lineno = 1
-
     from errors import lista_errores
     respaldo = list(lista_errores)
 
@@ -37,6 +36,50 @@ def obtener_tokens(codigo):
     return tokens_lista
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+@app.route('/reporte_simbolos', methods=['POST'])
+def reporte_simbolos_html():
+    datos = request.get_json()
+    codigo = datos.get('codigo', '')
+
+    lexer.lineno = 1
+    limpiar_errores()
+    ast = parser.parse(codigo, lexer=lexer)
+
+    if ast is None:
+        return "No se pudo generar el reporte: hay errores de sintaxis en el codigo.", 400
+
+    tabla = construir_tabla_simbolos(ast)
+
+    filas_html = "".join(
+        f"<tr><td>{s['nombre']}</td><td>{s['categoria']}</td><td>{s['tipo']}</td>"
+        f"<td>{s['ambito']}</td><td>{s['valor']}</td></tr>"
+        for s in tabla
+    )
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tabla de Simbolos - OxigenScript</title>
+<style>
+    body {{ font-family: sans-serif; padding: 20px; }}
+    table {{ border-collapse: collapse; width: 100%; }}
+    th, td {{ border: 1px solid #ccc; padding: 8px; text-align: left; }}
+    th {{ background-color: #f3f4f6; }}
+</style>
+</head>
+<body>
+<h2>Tabla de Simbolos - OxigenScript</h2>
+<table>
+<tr><th>Nombre</th><th>Categoria</th><th>Tipo</th><th>Ambito</th><th>Valor</th></tr>
+{filas_html}
+</table>
+</body>
+</html>"""
+
+    return html, 200, {'Content-Type': 'text/html'}
+
 
 @app.route('/ejecutar', methods=['POST'])
 def ejecutar():

@@ -188,9 +188,25 @@ function App() {
             )}
 
             {panelActivo === "simbolos" && (
-              <div className="data-section">
-                <h3>Tabla de símbolos</h3>
-                <table>
+                <div className="data-section">
+                  <h3>Tabla de símbolos</h3>
+                  <button
+                    onClick={async () => {
+                      const respuesta = await axios.post(
+                        "http://127.0.0.1:8000/reporte_simbolos",
+                        { codigo: codigo },
+                        { responseType: "blob" }
+                      );
+                      const enlace = document.createElement("a");
+                      enlace.href = URL.createObjectURL(respuesta.data);
+                      enlace.download = "tabla_simbolos.html";
+                      enlace.click();
+                    }}
+                    style={{ marginBottom: "10px" }}
+                  >
+                    Descargar como HTML
+                  </button>
+                  <table>
                   <thead>
                     <tr><th>Nombre</th><th>Categoría</th><th>Tipo</th><th>Ámbito</th><th>Valor</th></tr>
                   </thead>
