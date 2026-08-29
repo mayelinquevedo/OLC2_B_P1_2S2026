@@ -2,7 +2,7 @@
 
 Intérprete web para **OxigenScript**, un lenguaje académico con sintaxis inspirada en Rust, desarrollado como Proyecto 1 para el curso **Organización de Lenguajes y Compiladores 2** — Universidad de San Carlos de Guatemala, Facultad de Ingeniería.
 
-Permite escribir, ejecutar y depurar programas de OxigenScript desde el navegador, con reportes de análisis léxico, sintáctico, semántico, tabla de símbolos y árbol de sintaxis abstracta (AST).
+Permite escribir, ejecutar y depurar programas de OxigenScript desde el navegador, con reportes de análisis léxico, sintáctico, semántico, tabla de símbolos y árbol de sintaxis abstracta (AST)
 
 ---
 

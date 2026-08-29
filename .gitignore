@@ -11,7 +11,6 @@ build/
 #variables de entorno
 .env
 
-
 # Archivos generados por PLY (yacc)
 parser.out
 parsetab.py

@@ -1,7 +1,7 @@
 #API REST
 from flask import Flask, request, jsonify #flask, request (datos de la peticion) y jsonify (respuestas JSON)
 from flask_cors import CORS #CORS, para permitir peticiones desde el front
-import io   #io, para capturar la salida de los print() en memoria
+import io  #io, para capturar la salida de los print() en memoria
 import sys #sys, para poder redirigir temporalmente sys.stdout
 import base64
 from semantic import AnalizadorSemantico

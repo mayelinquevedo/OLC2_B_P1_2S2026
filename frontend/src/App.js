@@ -186,6 +186,7 @@ function App() {
                 </table>
               </div>
             )}
+            
             {panelActivo === "simbolos" && (
                 <div className="data-section">
                   <h3>Tabla de símbolos</h3>
