@@ -3,7 +3,7 @@
 - **Curso:** Organización de Lenguajes y Compiladores 2
 - **Universidad:** Universidad de San Carlos de Guatemala
 - **Facultad:** Ingeniería — Ingeniería en Ciencias y Sistemas
-- **Estudiante:** Mayelin Lucía Quevedo Camey
+- **Estudiante:** Mayelin Lucía Quevedo Camey , carnet: 202307771
 
 ---
 

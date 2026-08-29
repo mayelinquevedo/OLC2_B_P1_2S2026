@@ -5,7 +5,7 @@ import io   #io, para capturar la salida de los print() en memoria
 import sys #sys, para poder redirigir temporalmente sys.stdout
 import base64
 from semantic import AnalizadorSemantico
-from lexer import lexer #lexer ya construido
+from lexer import lexer     #lexer ya construido.
 from parser import parser #parser ya construido
 from interpreter import Interprete #clase Interprete (aun sin instanciar)
 from errors import limpiar_errores, obtener_errores
