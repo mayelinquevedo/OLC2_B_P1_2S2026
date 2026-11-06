@@ -66,7 +66,7 @@ def generar_ast(raiz, nombre_archivo="ast_output"):
 
     visitar(raiz)
     grafo.render(nombre_archivo, format="png", cleanup=True)
-    print(f"AST generado en: {nombre_archivo}.png")
+    #print(f"AST generado en: {nombre_archivo}.png")
 
 
 if __name__ == "__main__":

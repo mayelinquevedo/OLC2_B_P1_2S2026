@@ -43,7 +43,7 @@ class SenalContinue(Exception):
 
 
 
-#Interprete principal(ESTRUCTURA BASE)
+#Interprete principal
 class Interprete:
     def __init__(self):
         self.entorno_global = Entorno()
@@ -72,6 +72,17 @@ class Interprete:
             return señal.valor
         return None
 
+    def repeat(self, nodo, entorno):
+        while True:
+            try:
+                self.ejecutar_bloque(nodo.cuerpo, Entorno(padre=entorno))
+            except SenalBreak:
+                break
+            except SenalContinue:
+                continue
+
+
+
     def ejecutar_bloque(self, sentencias, entorno):
         for sentencia in sentencias:
             self.ejecutar_sentencia(sentencia, entorno)
@@ -97,7 +108,7 @@ class Interprete:
             valor = self.valor_por_defecto(nodo.tipo)
         entorno.declarar(nodo.nombre, valor)    
 
-    # VALOR_POR_DEFECTO 
+    # VALORES_POR_DEFECTO 
     def valor_por_defecto(self, tipo):
         if tipo == 'i32':
             return 0
@@ -151,6 +162,7 @@ class Interprete:
                     continue
                 raise
 
+### valores de retorno, break y continue
     def ejec_Return(self, nodo, entorno):
         valor = self.evaluar(nodo.valor, entorno) if nodo.valor is not None else None
         raise SenalReturn(valor)
@@ -181,6 +193,14 @@ class Interprete:
             self.evaluar(nodo, entorno)
         else:
             self.ejecutar_sentencia(nodo, entorno)
+
+
+    ###AGREGADO DESPUES DEL ULTIMO COMMIT 
+    def ejec_AsignacionIndice(self, nodo, entorno):
+        arreglo = entorno.obtener(nodo.nombre_arreglo)
+        indice = self.evaluar(nodo.indice, entorno)
+        valor = self.evaluar(nodo.valor, entorno)
+        arreglo[indice] = valor
 
     def eval_Literal(self, nodo, entorno):
         return nodo.valor

@@ -198,6 +198,17 @@ class StructInit(Nodo):
     def __repr__(self):
         return f"StructInit({self.nombre}, {self.valor})"
 
+##FUNCION AGREGADA LUEGO DEL ULTIMO commit
+class AsignacionIndice(Nodo):
+    def __init__(self, nombre_arreglo, indice, valor):
+        self.nombre_arreglo = nombre_arreglo
+        self.indice = indice
+        self.valor = valor
+
+    def __repr__(self):
+        return f"AsignacionIndice({self.nombre_arreglo}[{self.indice}] = {self.valor})"
+
+
 
 class Programa(Nodo):
     def __init__(self, declaraciones):

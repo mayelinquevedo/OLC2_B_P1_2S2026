@@ -87,7 +87,9 @@ def p_expresion_metodo(p):
     'expresion : expresion PUNTO IDENTIFICADOR PAREN_IZQ lista_argumentos PAREN_DER'
     p[0] = LlamadaFuncion(p[3], [p[1]] + p[5])
 
-
+def p_repeat(p):
+    'sentencia : REPEAT bloque PUNTO_COMA'
+    p[0] = repeat(p[2])
 
 
 
@@ -106,6 +108,11 @@ def p_sentencia_bloque(p):
     'sentencia : bloque'
     p[0] = Bloque(p[1])
 
+
+####FUNCION AGREGADA LUEGO DE ULTIMO COMMIT
+def p_sentencia_asignacion_indice(p):
+    'sentencia : IDENTIFICADOR CORCH_IZQ expresion CORCH_DER IGUAL expresion PUNTO_COMA'
+    p[0] = AsignacionIndice(p[1], p[3], p[6])
 
 def p_lista_sentencias_multiple(p):
     'lista_sentencias : lista_sentencias sentencia'
@@ -386,12 +393,14 @@ def p_error(p):
 # Declaracion de variables (let / let mut)
 
 #   con tipo explicito y valor
+
+#inicializada
 def p_declaracion_variable_completa(p):
     'sentencia : LET IDENTIFICADOR DOS_PUNTOS tipo IGUAL expresion PUNTO_COMA'
     nodo = DeclaracionVariable(p[2], p[4], p[6], mutable=False)
     nodo.linea = p.lineno(1)  # linea del token LET
     p[0] = nodo
-
+#mutable inicializada
 def p_declaracion_variable_mut_completa(p):
     'sentencia : LET MUT IDENTIFICADOR DOS_PUNTOS tipo IGUAL expresion PUNTO_COMA'
     p[0] = DeclaracionVariable(p[3], p[5], p[7], mutable=True)
@@ -408,6 +417,7 @@ def p_declaracion_variable_mut_inferida(p):
     p[0] = DeclaracionVariable(p[3], None, p[5], mutable=True)
 
 # solo tipo, sin valor inicial
+#sin inicializar mutable e inmutable
 def p_declaracion_variable_sin_valor(p):
     'sentencia : LET IDENTIFICADOR DOS_PUNTOS tipo PUNTO_COMA'
     p[0] = DeclaracionVariable(p[2], p[4], None, mutable=False)

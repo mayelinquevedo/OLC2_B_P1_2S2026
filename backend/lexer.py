@@ -17,6 +17,7 @@ reservadas = {
     'continue': 'CONTINUE',
     'true': 'TRUE',
     'false': 'FALSE',
+    'repeat' : 'REPEAT',
 
 #tipos del lenguaje
     'i32': 'TIPO_I32',
@@ -174,7 +175,7 @@ def t_RANGO(t):
     r'\.\.'
     return t
 
-#LUEGO SIMPLES
+#SIMPLES
 t_IGUAL = r'='
 t_MAYORQUE = r'>'
 t_MENORQUE = r'<'
@@ -211,8 +212,6 @@ def t_newline(t):
 
 
 #manejo de errores léxicos
-
-
 def t_error(t):
     columna = encontrar_columna(t.lexer.lexdata, t.lexpos)
     agregar_error("Lexico", f"Caracter no reconocido '{t.value[0]}'", t.lineno, columna)

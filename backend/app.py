@@ -112,6 +112,18 @@ def ejecutar():
                 'ast_imagen': None,
             })
 
+ # Generamos el AST fuera de la captura de stdout, con ruta absoluta
+        try:
+            ruta_ast = os.path.join(BASE_DIR, "reports", "ast_actual")
+            generar_ast(ast, ruta_ast)
+            with open(ruta_ast + ".png", "rb") as f:
+                ast_base64 = base64.b64encode(f.read()).decode('utf-8')
+        except Exception as e:
+            print(f"No se pudo generar AST: {e}")
+            ast_base64 = None
+
+        
+
         tabla_simbolos = construir_tabla_simbolos(ast)
         analizador = AnalizadorSemantico()
         analizador.analizar(ast)
@@ -121,15 +133,7 @@ def ejecutar():
         resultado = salida_consola.getvalue()
         sys.stdout = salida_original   # restauramos ANTES de generar el AST
 
-        # Generamos el AST fuera de la captura de stdout, con ruta absoluta
-        try:
-            ruta_ast = os.path.join(BASE_DIR, "reports", "ast_actual")
-            generar_ast(ast, ruta_ast)
-            with open(ruta_ast + ".png", "rb") as f:
-                ast_base64 = base64.b64encode(f.read()).decode('utf-8')
-        except Exception as e:
-            print(f"No se pudo generar AST: {e}")
-            ast_base64 = None
+       
 
         return jsonify({
             'exito': True,
